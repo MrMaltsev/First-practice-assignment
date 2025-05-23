@@ -10,6 +10,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.openqa.selenium.WebElement;
 import pages.BellAfterSearch;
 import pages.BellBeforeSearch;
+import pages.BellBeforeFilterSearch;
+import pages.BellAfterFilterSearch;
 
 import static helpers.Properties.testsProperties;
 
@@ -30,6 +32,34 @@ public class FirstTask extends BaseTests {
                 .collect(Collectors.toList());
         lastTestResults = matchingResults;
         lastTestWord = word;
+    }
 
+    @Feature("Проверка фильтров")
+    @DisplayName("Проверка вакансий по фильтрам")
+    @ParameterizedTest(name="{displayName}: {arguments}")
+    @CsvSource({"Архитекторы", "Дизайнеры"})
+    public void testFilterSearch(String specialization) {
+        chromeDriver.get(testsProperties.bellIntegratorUrl());
+        BellBeforeFilterSearch filterPage = new BellBeforeFilterSearch(chromeDriver);
+        filterPage.selectSpecialization(specialization);
+        BellAfterFilterSearch afterFilterSearch = new BellAfterFilterSearch(chromeDriver);
+        List<WebElement> results = afterFilterSearch.getResults();
+        lastTestResults = results.stream().map(WebElement::getText).collect(Collectors.toList());
+        lastTestWord = specialization;
+    }
+
+    @Feature("Проверка горячих вакансий")
+    @DisplayName("Проверка вакансий по фильтру 'Горячие вакансии'")
+    @ParameterizedTest(name="{displayName}")
+    @CsvSource({"true"})
+    public void testHotVacanciesSearch(String hotVacancies) {
+        chromeDriver.get(testsProperties.bellIntegratorUrl());
+        BellBeforeFilterSearch filterPage = new BellBeforeFilterSearch(chromeDriver);
+        filterPage.selectHotVacancies();
+        System.out.println("После применения фильтра 'Горячие вакансии', текущий URL: " + chromeDriver.getCurrentUrl());
+        BellAfterFilterSearch afterFilterSearch = new BellAfterFilterSearch(chromeDriver);
+        List<WebElement> results = afterFilterSearch.getResults();
+        lastTestResults = results.stream().map(WebElement::getText).collect(Collectors.toList());
+        lastTestWord = "Горячие вакансии";
     }
 }
