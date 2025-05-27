@@ -48,6 +48,22 @@ public class FirstTask extends BaseTests {
         lastTestWord = specialization;
     }
 
+
+    @Feature("Проверка фильтров")
+    @DisplayName("Проверка вакансий по фильтрам")
+    @ParameterizedTest(name="{displayName}: {arguments}")
+    @CsvSource({"Беларусь", "Екатеринбург"})
+    public void testFilterSearchTwo(String location) {
+        chromeDriver.get(testsProperties.bellIntegratorUrl());
+        BellBeforeFilterSearch filterPage = new BellBeforeFilterSearch(chromeDriver);
+        filterPage.selectLocation(location);
+        BellAfterFilterSearch afterFilterSearch = new BellAfterFilterSearch(chromeDriver);
+        List<WebElement> results = afterFilterSearch.getResults();
+        lastTestResults = results.stream().map(WebElement::getText).collect(Collectors.toList());
+        lastTestWord = location;
+    }
+
+
     @Feature("Проверка горячих вакансий")
     @DisplayName("Проверка вакансий по фильтру 'Горячие вакансии'")
     @ParameterizedTest(name="{displayName}")
@@ -62,4 +78,21 @@ public class FirstTask extends BaseTests {
         lastTestResults = results.stream().map(WebElement::getText).collect(Collectors.toList());
         lastTestWord = "Горячие вакансии";
     }
+
+
+    @Feature("Проверка вакансий только удаленно")
+    @DisplayName("Проверка вакансий по фильтру 'Только удаленно'")
+    @ParameterizedTest(name="{displayName}")
+    @CsvSource({"true"})
+    public void testOnlyDistantSearch(String OnlyDistant) {
+        chromeDriver.get(testsProperties.bellIntegratorUrl());
+        BellBeforeFilterSearch filterPage = new BellBeforeFilterSearch(chromeDriver);
+        filterPage.selectOnlyDistant();
+        System.out.println("После применения фильтра 'Горячие вакансии', текущий URL: " + chromeDriver.getCurrentUrl());
+        BellAfterFilterSearch afterFilterSearch = new BellAfterFilterSearch(chromeDriver);
+        List<WebElement> results = afterFilterSearch.getResults();
+        lastTestResults = results.stream().map(WebElement::getText).collect(Collectors.toList());
+        lastTestWord = "Только удаленно";
+    }
+
 }
